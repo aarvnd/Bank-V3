@@ -12,10 +12,17 @@ import java.sql.DriverManager;
 import java.sql.Statement;
 
 public class JdbcDAOFactory extends DAOFactory {
-    // Database Config - Update these for your local setup
-    private static final String URL = "jdbc:mysql://localhost:3306/bank_db?createDatabaseIfNotExist=true";
-    private static final String USER = "root";
-    private static final String PASS = "qwertyuiop"; // CHANGE THIS
+    // Database config comes from the environment so no credentials live in source:
+    // BANK_DB_URL, BANK_DB_USER, BANK_DB_PASSWORD
+    private static final String URL = env("BANK_DB_URL",
+            "jdbc:mysql://localhost:3306/bank_db?createDatabaseIfNotExist=true");
+    private static final String USER = env("BANK_DB_USER", "root");
+    private static final String PASS = env("BANK_DB_PASSWORD", "");
+
+    private static String env(String name, String fallback) {
+        String value = System.getenv(name);
+        return (value == null || value.isBlank()) ? fallback : value;
+    }
 
     public static Connection getConnection() throws Exception {
         return DriverManager.getConnection(URL, USER, PASS);
